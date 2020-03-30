@@ -4,6 +4,7 @@ COPY . /opt/project
 WORKDIR /opt/project
 
 RUN pip install -r requirements.txt
+RUN bash -c "mkdir -p static/sounds/{words,examples} && mkdir static/words"
 
 ENV FLASK_APP=server.py 
 EXPOSE 5000

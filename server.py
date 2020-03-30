@@ -3,7 +3,6 @@
 from flask import Flask
 from flask import render_template, request
 import urllib, json, hashlib
-from bs4 import BeautifulSoup
 from time import sleep
 
 

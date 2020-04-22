@@ -4,6 +4,7 @@ from flask import Flask
 from flask import render_template, request
 import urllib, json, hashlib
 from time import sleep
+from os import path
 
 
 def text_to_speech(text, voice):
@@ -20,6 +21,48 @@ def text_to_speech(text, voice):
 def get_hash(text, voice, speed='normal'):
     return hashlib.md5((text + voice + speed).encode()).hexdigest()
 
+def get_word_path(text, voice):
+    return "static/sounds/words/{0}-{1}.mp3".format(text, voice.split("-")[1].lower())
+
+def get_sentence_path(text, voice):
+    return "static/sounds/examples/{0}.mp3".format(get_hash(text, voice))
+
+def save_word(text, voice):
+    url = text_to_speech(text, voice)
+    sleep(2)
+    try:
+        urllib.request.urlretrieve(url, get_word_path(text, voice))
+    except Exception:
+        print("Problem with download word: " + text)
+        print("Url is: " + url)
+        try:
+            url = text_to_speech(text, voice)
+            sleep(5)
+            urllib.request.urlretrieve(url, get_word_path(text, voice))
+        except Exception:
+            print("ERROR: Cannot download word: " + text)
+            print("Url is: " + url)
+            return
+    print("Saved word: " + text)
+
+def save_sentence(text, voice):
+    url = text_to_speech(text, voice)
+    sleep(2)
+    try:
+        urllib.request.urlretrieve(url, get_sentence_path(text, voice))
+    except Exception:
+        print("Problem with download sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
+        print("Url is: " + url)
+        try:
+            url = text_to_speech(text, voice)
+            sleep(5)
+            urllib.request.urlretrieve(url, get_sentence_path(text, voice))
+        except Exception:
+            print("ERROR: Cannot download sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
+            print("Url is: " + url)
+            return
+
+    print("Saved sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
 
 
 app = Flask(__name__)
@@ -40,9 +83,7 @@ def download_word():
     if voice != "en-GB" and voice != "en-US":
         return {"status": 400, "message": "Voice is in wrong format."}
 
-    url = text_to_speech(text, voice)
-    sleep(1)
-    urllib.request.urlretrieve(url, "static/sounds/words/{0}-{1}.mp3".format(text, voice.split("-")[1].lower()))
+    save_word(text, voice)
 
     return {"status": 200}
 
@@ -57,10 +98,29 @@ def download_sentence():
     if voice != "en-GB" and voice != "en-US":
         return {"status": 400, "message": "Voice is in wrong format."}
 
-    url = text_to_speech(text, voice)
-    sleep(1)
-    urllib.request.urlretrieve(url, "static/sounds/examples/{0}.mp3".format(get_hash(text, voice)))
+    save_sentence(text, voice)
 
     return {"status": 200}
 
 
+@app.route('/download/all', methods=['GET'])
+def download_all():
+    voice = request.args.get('voice', 'en-GB')
+
+    resp = urllib.request.urlopen("https://drakeman.cz/api/word/list?page=1&limit=10000&state=correct")
+    words = json.loads(resp.read())["payload"]["words"]
+
+    counter = 0
+    for word in words:
+        counter += 1
+        if (counter == 2000): break
+        if (path.exists(get_word_path(word["text"], voice))): continue
+
+        save_word(word["text"], voice)
+        for example in word["examples"]:
+            save_sentence(example, voice)
+            sleep(10)
+        print()
+
+
+    return "ok"

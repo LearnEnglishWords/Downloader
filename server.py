@@ -33,17 +33,17 @@ def save_word(text, voice):
     try:
         urllib.request.urlretrieve(url, get_word_path(text, voice))
     except Exception:
-        print("Problem with download word: " + text)
+        print("Problem with download word: " + text + " with voice: " + voice)
         print("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_word_path(text, voice))
         except Exception:
-            print("ERROR: Cannot download word: " + text)
+            print("ERROR: Cannot download word: " + text + " with voice: " + voice)
             print("Url is: " + url)
             return
-    print("Saved word: " + text)
+    print("Saved word: " + text + " with voice: " + voice)
 
 def save_sentence(text, voice):
     url = text_to_speech(text, voice)
@@ -51,18 +51,18 @@ def save_sentence(text, voice):
     try:
         urllib.request.urlretrieve(url, get_sentence_path(text, voice))
     except Exception:
-        print("Problem with download sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
+        print("Problem with download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
         print("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_sentence_path(text, voice))
         except Exception:
-            print("ERROR: Cannot download sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
+            print("ERROR: Cannot download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
             print("Url is: " + url)
             return
 
-    print("Saved sentence: \"" + text + "\" as: " + get_hash(text, voice) + ".mp3")
+    print("Saved sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
 
 
 app = Flask(__name__)
@@ -106,20 +106,22 @@ def download_sentence():
 @app.route('/download/all', methods=['GET'])
 def download_all():
     voice = request.args.get('voice', 'en-GB')
+    limit = request.args.get('limit', 1000)
 
-    resp = urllib.request.urlopen("https://drakeman.cz/api/word/list?page=1&limit=10000&state=correct")
+    resp = urllib.request.urlopen("https://drakeman.cz/api/word/list?page=1&limit=20000&state=correct")
     words = json.loads(resp.read())["payload"]["words"]
 
     counter = 0
     for word in words:
         counter += 1
-        if (counter == 2000): break
+        if (counter == limit): break
         if (path.exists(get_word_path(word["text"], voice))): continue
 
         save_word(word["text"], voice)
+        sleep(10)
         for example in word["examples"]:
             save_sentence(example, voice)
-            sleep(10)
+            sleep(20)
         print()
 
 

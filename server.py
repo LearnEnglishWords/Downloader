@@ -4,7 +4,7 @@ from flask import Flask
 from flask import render_template, request
 import urllib, json, hashlib
 from time import sleep
-from os import path
+from os import path, environ
 
 
 def text_to_speech(text, voice):
@@ -108,7 +108,7 @@ def download_all():
     voice = request.args.get('voice', 'en-GB')
     limit = request.args.get('limit', 1000)
 
-    resp = urllib.request.urlopen("https://drakeman.cz/api/word/list?page=1&limit=20000&state=correct")
+    resp = urllib.request.urlopen("{}/word/list?page=1&limit=20000&state=correct".format(environ.get("BACKEND_URL")))
     words = json.loads(resp.read())["payload"]["words"]
 
     counter = 0
@@ -121,7 +121,7 @@ def download_all():
         sleep(10)
         for example in word["examples"]:
             save_sentence(example, voice)
-            sleep(20)
+            sleep(30)
         print()
 
 

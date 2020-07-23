@@ -50,17 +50,17 @@ def save_word(text, voice):
     try:
         urllib.request.urlretrieve(url, get_word_path(text, voice))
     except Exception:
-        app.logger.error("Problem with download word: " + text + " with voice: " + voice)
+        app.logger.error("Problem with download word: '" + text + "' with voice: '" + voice + "'")
         app.logger.info("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_word_path(text, voice))
         except Exception:
-            app.logger.error("Cannot download word: " + text + " with voice: " + voice)
+            app.logger.error("Cannot download word: '" + text + "' with voice: '" + voice + "'")
             app.logger.info("Url is: " + url)
             return
-    app.logger.info("Saved word: " + text + " with voice: " + voice)
+    app.logger.info("Saved word: '" + text + "' with voice: '" + voice + "'")
 
 def save_sentence(text, voice):
     url = text_to_speech(text, voice)
@@ -68,18 +68,18 @@ def save_sentence(text, voice):
     try:
         urllib.request.urlretrieve(url, get_sentence_path(text, voice))
     except Exception:
-        app.logger.error("Problem with download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+        app.logger.error("Problem with download sentence: \"" + text + "\" with voice: '" + voice + "' as: " + get_hash(text, voice) + ".mp3")
         app.logger.info("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_sentence_path(text, voice))
         except Exception:
-            app.logger.error("Cannot download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+            app.logger.error("Cannot download sentence: \"" + text + "\" with voice: '" + voice + "' as: " + get_hash(text, voice) + ".mp3")
             app.logger.info("Url is: " + url)
             return
 
-    app.logger.info("Saved sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+    app.logger.info("Saved sentence: \"" + text + "\" with voice: '" + voice + "' as: " + get_hash(text, voice) + ".mp3")
 
 
 
@@ -109,6 +109,7 @@ def download_word_all():
 
     for voice in ['en-GB', 'en-US']:
         for example in word["examples"]:
+            if example == "": continue
             if (path.exists(get_sentence_path(example, voice))): continue
             sleep(15)
             save_sentence(example, voice)
@@ -165,6 +166,7 @@ def download_all():
         save_word(word["text"], voice)
         sleep(10)
         for example in word["examples"]:
+            if example == "": continue
             save_sentence(example, voice)
             sleep(30)
         print()

@@ -89,6 +89,19 @@ def index():
     return render_template('index.html', message=message)
 
 
+@app.route('/hash', methods=['GET'])
+def hash():
+    text = request.args.get('text', '')
+    voice = request.args.get('voice', 'en-GB')
+
+    if text == '':
+        return {"status": 400, "message": "Word text is missing."}
+    if voice != "en-GB" and voice != "en-US":
+        return {"status": 400, "message": "Voice is in wrong format."}
+
+    return {"status": 200, "hash": get_hash(text, voice)}
+
+
 @app.route('/download/word/all', methods=['GET'])
 def download_word_all():
     text = request.args.get('text', '')

@@ -2,10 +2,27 @@
 
 from flask import Flask
 from flask import render_template, request
+from logging.config import dictConfig
 import urllib, json, hashlib
 from time import sleep
 from os import path, environ
 
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+app = Flask(__name__)
 
 def text_to_speech(text, voice):
     data = bytes(json.dumps({"engine": "Google", "data": {"text": text, "voice": voice}}), encoding='utf-8')
@@ -33,17 +50,17 @@ def save_word(text, voice):
     try:
         urllib.request.urlretrieve(url, get_word_path(text, voice))
     except Exception:
-        print("Problem with download word: " + text + " with voice: " + voice)
-        print("Url is: " + url)
+        app.logger.error("Problem with download word: " + text + " with voice: " + voice)
+        app.logger.info("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_word_path(text, voice))
         except Exception:
-            print("ERROR: Cannot download word: " + text + " with voice: " + voice)
-            print("Url is: " + url)
+            app.logger.error("Cannot download word: " + text + " with voice: " + voice)
+            app.logger.info("Url is: " + url)
             return
-    print("Saved word: " + text + " with voice: " + voice)
+    app.logger.info("Saved word: " + text + " with voice: " + voice)
 
 def save_sentence(text, voice):
     url = text_to_speech(text, voice)
@@ -51,21 +68,20 @@ def save_sentence(text, voice):
     try:
         urllib.request.urlretrieve(url, get_sentence_path(text, voice))
     except Exception:
-        print("Problem with download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
-        print("Url is: " + url)
+        app.logger.error("Problem with download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+        app.logger.info("Url is: " + url)
         try:
             url = text_to_speech(text, voice)
             sleep(5)
             urllib.request.urlretrieve(url, get_sentence_path(text, voice))
         except Exception:
-            print("ERROR: Cannot download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
-            print("Url is: " + url)
+            app.logger.error("Cannot download sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+            app.logger.info("Url is: " + url)
             return
 
-    print("Saved sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
+    app.logger.info("Saved sentence: \"" + text + " with voice: " + voice + "\" as: " + get_hash(text, voice) + ".mp3")
 
 
-app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -99,6 +115,7 @@ def download_sentence():
         return {"status": 400, "message": "Voice is in wrong format."}
 
     save_sentence(text, voice)
+    app.info.info("Generated hash is: " + get_hash(text, voice))
 
     return {"status": 200}
 

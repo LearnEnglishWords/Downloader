@@ -89,6 +89,34 @@ def index():
     return render_template('index.html', message=message)
 
 
+@app.route('/download/word/all', methods=['GET'])
+def download_word_all():
+    text = request.args.get('text', '')
+
+    if text == '':
+        return {"status": 400, "message": "Word text is missing."}
+
+    url = "{}/word/find?text={}".format(environ.get("BACKEND_URL"), text)
+
+    resp = urllib.request.urlopen(url)
+    word = json.loads(resp.read())["payload"]
+
+    hashes = []
+
+    for voice in ['en-GB', 'en-US']:
+        if (not path.exists(get_word_path(text, voice))): 
+            save_word(text, voice)
+
+    for voice in ['en-GB', 'en-US']:
+        for example in word["examples"]:
+            if (path.exists(get_sentence_path(example, voice))): continue
+            sleep(15)
+            save_sentence(example, voice)
+            hashes.append(get_hash(example, voice))
+    
+    return {"status": 200, "hashes": hashes}
+
+
 @app.route('/download/word', methods=['GET'])
 def download_word():
     text = request.args.get('text', '')

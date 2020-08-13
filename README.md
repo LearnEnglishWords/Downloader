@@ -1,5 +1,5 @@
 # Local setup:
-
+```
 virtualenv -p python3 venv
 source ./grello-dev/bin/activate
 

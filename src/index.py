@@ -7,6 +7,7 @@ import urllib, json, hashlib
 from time import sleep
 from os import path, environ
 from text_to_speech import TextToSpeech
+from translator import Translator
 
 dictConfig({
     'version': 1,
@@ -91,3 +92,17 @@ def download_sentence():
     return {"status": 200}
 
 
+@app.route('/translate', methods=['POST'])
+def translate():
+    text = request.form['text']
+    engine = request.form['engine']
+
+    if text == '':
+        return {"status": 400, "message": "Text for translate is missing."}
+    if engine != "google" and engine != "microsoft":
+        return {"status": 400, "message": "Engine is in wrong format."}
+
+    t = Translator(app.logger, engine)
+    result = t.translate(text)
+
+    return {"status": 200, "result": result}

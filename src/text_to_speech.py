@@ -90,5 +90,3 @@ class TextToSpeech:
 
         return hashes
 
-
-

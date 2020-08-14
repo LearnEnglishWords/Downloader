@@ -48,3 +48,11 @@ run_test "Download all word data" "${hello_word_data[*]}" "http://localhost:5000
 echo ''
 run_test "Download all word data again" "${hello_word_data[*]}" "http://localhost:5000/download/word/all?text=hello" 
 clean
+
+echo ''
+echo 'Test Microsoft translator:'
+echo $(curl -s localhost:5000/translate -d 'text=hello&engine=microsoft&from=en&to=cs') === '{"result":"dobr\u00fd den","status":200}'
+echo ''
+echo 'Test Google translator:'
+echo $(curl -s localhost:5000/translate -d 'text=hello&engine=google&from=en&to=cs') === '{"result":"Ahoj","status":200}'
+echo ''

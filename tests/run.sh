@@ -16,9 +16,9 @@ function run_test {
     data=$5
 
     if [[ ${method} == 'POST' ]]; then
-        curl -d ${data} ${send} 
+        curl -s -d ${data} ${send} > /dev/null
     else
-        curl ${send} 
+        curl -s ${send} > /dev/null
     fi
 
     for item in ${checks[*]}; do
@@ -32,10 +32,10 @@ function run_test {
 }
 
 clean
-run_test "Download word with GB voice" "static/sounds/words/car-gb.mp3" "http://localhost:5000/download/word?text=car&voice=en-GB" && clean
-run_test "Download word with US voice" "static/sounds/words/car-us.mp3" "http://localhost:5000/download/word?text=car&voice=en-US" && clean
-run_test "Download sentence with GB voice" "static/sounds/examples/33bb93a69278c6a00b0215ec91e1a911.mp3" "http://localhost:5000/download/sentence" "POST" "text=Hello%20world&voice=en-GB" && clean
-run_test "Download sentence with US voice" "static/sounds/examples/d389c5d2de592fe40af4355aa20e88bc.mp3" "http://localhost:5000/download/sentence" "POST" "text=Hello%20world&voice=en-US" && clean
+run_test "Test download word with GB voice" "static/sounds/words/car-gb.mp3" "http://localhost:5000/download/word?text=car&voice=en-GB" && clean
+run_test "Test download word with US voice" "static/sounds/words/car-us.mp3" "http://localhost:5000/download/word?text=car&voice=en-US" && clean
+run_test "Test download sentence with GB voice" "static/sounds/examples/33bb93a69278c6a00b0215ec91e1a911.mp3" "http://localhost:5000/download/sentence" "POST" "text=Hello%20world&voice=en-GB" && clean
+run_test "Test download sentence with US voice" "static/sounds/examples/d389c5d2de592fe40af4355aa20e88bc.mp3" "http://localhost:5000/download/sentence" "POST" "text=Hello%20world&voice=en-US" && clean
 
 hello_word_data=(static/sounds/examples/1881ad121c8b7ebb6551e1dd0566f494.mp3  static/sounds/examples/9b72d34358a3ae6322c4b051fa9b92ef.mp3
 static/sounds/examples/298a0d8af2042299691354cb06f55e09.mp3  static/sounds/examples/ca6e1232e0819963c8a22f0492708e45.mp3
@@ -44,9 +44,8 @@ static/sounds/examples/6be6ab498498612ae4babff9dff371fc.mp3  static/sounds/examp
 static/sounds/words/hello-gb.mp3  static/sounds/words/hello-us.mp3)
 
 clean
-run_test "Download all word data" "${hello_word_data[*]}" "http://localhost:5000/download/word/all?text=hello" 
-echo ''
-run_test "Download all word data again" "${hello_word_data[*]}" "http://localhost:5000/download/word/all?text=hello" 
+run_test "Test download all word data" "${hello_word_data[*]}" "http://localhost:5000/download/word/all?text=hello" 
+run_test "Test download all word data again" "${hello_word_data[*]}" "http://localhost:5000/download/word/all?text=hello" 
 clean
 
 echo ''

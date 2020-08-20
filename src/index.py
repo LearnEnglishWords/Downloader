@@ -29,6 +29,15 @@ app = Flask(__name__)
 tts = TextToSpeech(app.logger)
 
 
+@app.after_request
+def add_header(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT,DELETE"
+    response.headers["Access-Control-Allow-Headers"] = "Origin,Cache-Control,Accept,X-Access-Token,X-Requested-With,Content-Type,Access-Control-Request-Method"
+    return response
+
+
 @app.route('/')
 def index():
     message = "Hello world!!"

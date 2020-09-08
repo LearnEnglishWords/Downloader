@@ -17,7 +17,7 @@ class Translator:
         normal = subprocess.run(['curl', 'https://www.webtran.eu/gtranslate/', '--data-raw', 'text={}&gfrom={}&gto={}&key=ABC'.format(text, from_lang, to_lang) ],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             check=True)
-        return normal.stdout[3:].decode()
+        return normal.stdout.decode()
                                                           
     def translate(self, text, from_lang="en", to_lang="cs"):
         if (self.engine == "microsoft"):

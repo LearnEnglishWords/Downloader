@@ -1,12 +1,12 @@
 version: "3"
 services:
   app:
-    image: applemann/lew-static:1.1.0
+    image: applemann/lew-static:1.1.1
     build: .
     ports:
     - "127.0.0.1:5000:5000"
     environment:
-    - BACKEND_URL=http://localhost/api
+      - BACKEND_URL=http://localhost:8080
     volumes:
     - "./static:/opt/project/static"
 

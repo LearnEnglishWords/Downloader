@@ -1,4 +1,4 @@
 __pychache__/
 venv/
 *.pyc
-static/
+*.mp3

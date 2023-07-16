@@ -6,7 +6,18 @@ services:
     ports:
     - "127.0.0.1:5000:5000"
     environment:
-      - BACKEND_URL=http://localhost:8080
+      - BACKEND_URL=http://162.19.245.129
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
     volumes:
     - "./static:/opt/project/static"
 
+  nginx:
+    image: nginx
+    volumes:
+     - ./static:/usr/share/nginx/html
+    ports:
+     - "9000:80"
+    environment:
+     - NGINX_HOST=162.19.245.129
+     - NGINX_PORT=80

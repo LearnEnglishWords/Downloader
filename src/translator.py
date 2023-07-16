@@ -11,10 +11,10 @@ class Translator:
         normal = subprocess.run(['curl', 'https://www.translate.com/translator/ajax_translate', '--data-raw', 'text_to_translate={}&source_lang={}&translated_lang={}&use_cache_only=false'.format(text, from_lang, to_lang) ],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             check=True)
-        return json.loads(normal.stdout)["translated_text"]
+        return json.loads(normal.stdout.decode())["translated_text"]
 
     def _translate_with_google(self, text, from_lang, to_lang):
-        normal = subprocess.run(['curl', 'https://www.webtran.eu/gtranslate/', '--data-raw', 'text={}&gfrom={}&gto={}&key=ABC'.format(text, from_lang, to_lang) ],
+        normal = subprocess.run(['curl', 'https://www.webtran.eu/oldman/', '--data-raw', 'x1=Ares&x2={}&x3={}&x4={}'.format(text, from_lang, to_lang) ],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             check=True)
         return normal.stdout.decode()

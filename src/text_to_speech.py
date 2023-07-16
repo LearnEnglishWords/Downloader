@@ -13,7 +13,7 @@ class TextToSpeech:
         resp = urllib.request.urlopen(req)
 
         code_name = json.loads(resp.read())["id"]
-        url = "https://storage.soundoftext.com/{0}.mp3".format(code_name)
+        url = "https://files.soundoftext.com/{0}.mp3".format(code_name)
         return url
 
     def _get_word_path(self, text, voice):
